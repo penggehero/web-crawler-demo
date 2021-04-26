@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Crowler</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <!-- 引入组件库 -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+<div id="app">
+    <template>
+
+        <div class="block">
+            <span class="demonstration">请选择日期(只有4月26号开始以后的数据...)    </span>
+
+
+            <el-date-picker
+                    v-model="datetime"
+                    type="date"
+                    placeholder="请选择日期">
+            </el-date-picker>
+
+        </div>
+        <div class="block">
+            <p>腾讯课堂分类为</p>
+            <el-tree
+                    :data="data"
+                    node-key="id"
+                    :expand-on-click-node="false">
+      <span class="custom-tree-node" slot-scope="{ node, data }">
+        <span>{{ node.label }}</span>
+        <span>
+           <b> 课程数量：</b>
+          <el-button
+                  type="text"
+                  size="mini"
+                  @click="() => getInfo(node, data)">
+              {{data.courseNumber}}
+          </el-button>
+        </span>
+      </span>
+            </el-tree>
+        </div>
+        <br>
+        <span class="demonstration">你选择的分类为 : <b>{{name}}</b></span>
+        <br>
+        <br>
+
+        <el-table
+                :data="tableData"
+                border
+                fit
+                highlight-current-row
+                :header-cell-style="{background:'#ecf5ff',fontSize:'14px',color:'#606266'}"
+                style="width: 100%">
+
+            <el-table-column
+                    prop="courseId"
+                    label="课程id（腾讯学堂官方）"
+                    align="center">
+            </el-table-column>
+
+
+            <el-table-column
+                    prop="title"
+                    label="课程标题"
+                    align="center">
+            </el-table-column>
+
+            <el-table-column
+                    prop="teacher"
+                    label="老师"
+                    align="center">
+            </el-table-column>
+
+            <el-table-column
+                    prop="price"
+                    label="价格"
+                    align="center">
+            </el-table-column>
+            <el-table-column
+                    prop="date"
+                    label="爬取时间"
+                    align="center">
+            </el-table-column>
+
+        </el-table>
+
+        <!-- 分页控件区 -->
+        <el-pagination
+                style="float:right"
+                :current-page="page"
+                :page-sizes="[10, 20, 50, 100]"
+                :page-size="rows"
+                :total="total"
+                layout="total,sizes,prev, pager, next"
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+        />
+    </template>
+
+
+</div>
+
+
+</body>
+<script>
+    new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                id: 1000,
+                datetime: new Date(),
+                data: [],
+                tableData: [],
+                page: 1,
+                rows: 10,
+                mt: null,
+                st: null,
+                tt: null,
+                name: '',
+                total: 0,
+                multipleTable: null
+            }
+        },
+        created() {
+            this.getTree()
+        },
+        methods: {
+            getTree: function () {
+                axios
+                    .get('http://localhost/crawler/getTree', {params: {
+                            date: this.datetime.toLocaleDateString()
+                    }})
+                    .then(res => {
+                    this.data = res.data;
+            });
+
+
+            }
+            ,
+            getInfo: function (node, data) {
+                this.mt = data.mt;
+                this.st = data.st;
+                this.tt = data.tt;
+                this.name = data.label;
+                this.getPage()
+            }
+            ,
+            getPage: function () {
+                axios
+                    .post('http://localhost/crawler/getPage', this.getParam())
+                    .then(res => {
+                    this.tableData = res.data.list;
+                    this.total = res.data.total;
+                });
+            }
+            ,
+            getParam: function () {
+                return {
+                    pageNum: this.page,
+                    pageSize: this.rows,
+                    mt: this.mt,
+                    st: this.st,
+                    tt: this.tt
+                }
+            }
+            ,
+            // 获取表格选中值
+            handleSelectionChange: function (val) {
+                this.multipleTable = val
+            }
+            ,
+            handleSizeChange: function (size) {
+                this.rows = size
+                this.getPage()
+
+            }
+            ,
+            handleCurrentChange: function (page) {
+                this.page = page
+                this.getPage()
+            }
+        },
+        watch: {
+            datetime: function () {
+                this.data=[];
+                this.tableData=[];
+                this.total=0;
+                this.getTree()
+
+            }
+        }
+    })
+</script>
+
+<style>
+    .custom-tree-node {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 15px;
+        padding-right: 20px;
+    }
+</style>
+</html>

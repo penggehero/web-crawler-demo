@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wp.webcrawlerdemo.mapper.CourseCategoryMapper">
+
+    <resultMap type="com.wp.webcrawlerdemo.domain.entity.CourseCategory" id="CourseCategoryMap">
+        <result property="id" column="id" jdbcType="OTHER"/>
+        <result property="courseCategoryName" column="course_category_name" jdbcType="VARCHAR"/>
+        <result property="mt" column="mt" jdbcType="INTEGER"/>
+        <result property="st" column="st" jdbcType="INTEGER"/>
+        <result property="tt" column="tt" jdbcType="INTEGER"/>
+        <result property="level" column="level" jdbcType="INTEGER"/>
+        <result property="courseNumber" column="course_number" jdbcType="INTEGER"/>
+        <result property="date" column="date" jdbcType="DATE"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="CourseCategoryMap">
+        select
+          id, course_category_name, mt, st, tt, level, course_number, date
+        from course_category
+        where id = #{id}
+    </select>
+
+    <select id="queryByLevel" resultMap="CourseCategoryMap">
+        select
+        id, course_category_name, mt, st, tt, level, course_number, date
+        from course_category
+        <where>
+            <if test="date != null">
+                and date = #{date,jdbcType=DATE}
+            </if>
+            <if test="level != null">
+                and level = #{level}
+            </if>
+        </where>
+
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="CourseCategoryMap">
+        select
+          id, course_category_name, mt, st, tt, level, course_number, date
+        from course_category
+        limit #{offset}, #{limit}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="CourseCategoryMap">
+        select
+        id, course_category_name, mt, st, tt, level, course_number, date
+        from course_category
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="courseCategoryName != null and courseCategoryName != ''">
+                and course_category_name = #{courseCategoryName}
+            </if>
+            <if test="mt != null">
+                and mt = #{mt}
+            </if>
+            <if test="st != null">
+                and st = #{st}
+            </if>
+            <if test="tt != null">
+                and tt = #{tt}
+            </if>
+            <if test="level != null">
+                and level = #{level}
+            </if>
+            <if test="courseNumber != null">
+                and course_number = #{courseNumber}
+            </if>
+            <if test="date != null">
+                and date = #{date}
+            </if>
+        </where>
+    </select>
+    <select id="queryByDate" resultMap="CourseCategoryMap">
+        select
+        id, course_category_name, mt, st, tt, level, course_number, date
+        from course_category
+        where date = #{date}
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into course_category(course_category_name, mt, st, tt, level, course_number, date)
+        values (#{courseCategoryName}, #{mt}, #{st}, #{tt}, #{level}, #{courseNumber}, #{date})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update course_category
+        <set>
+            <if test="courseCategoryName != null and courseCategoryName != ''">
+                course_category_name = #{courseCategoryName},
+            </if>
+            <if test="mt != null">
+                mt = #{mt},
+            </if>
+            <if test="st != null">
+                st = #{st},
+            </if>
+            <if test="tt != null">
+                tt = #{tt},
+            </if>
+            <if test="level != null">
+                level = #{level},
+            </if>
+            <if test="courseNumber != null">
+                course_number = #{courseNumber},
+            </if>
+            <if test="date != null">
+                date = #{date},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from course_category where id = #{id}
+    </delete>
+
+</mapper>
