@@ -1,8 +1,7 @@
 package com.wp.webcrawlerdemo.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.scheduling.annotation.Scheduled;
 
 import java.util.Date;
 
@@ -31,6 +30,6 @@ public class Course {
     // 是否是合集类型
     private Boolean isPackage;
     // 爬取时间
-    @DateTimeFormat(pattern = "yyyy/MM/dd")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date date;
 }

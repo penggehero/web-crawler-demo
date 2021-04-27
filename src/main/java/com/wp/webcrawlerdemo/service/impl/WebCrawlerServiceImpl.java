@@ -67,7 +67,7 @@ public class WebCrawlerServiceImpl implements WebCrawlerService {
 
     @Override
     public CourseCategoryTreeVo getCourseCategoryTreeVo(String dateStr) throws Exception {
-        Date date = new SimpleDateFormat("yyyy/MM/dd").parse(dateStr);
+        Date date = new SimpleDateFormat("yyyy-MM-dd").parse(dateStr);
         List<CourseCategory> courseCategories = courseCategoryMapper.queryByDate(date);
         CourseCategoryTreeVo courseCategoryTreeVo = new CourseCategoryTreeVo();
         courseCategoryTreeVo.setId(0);

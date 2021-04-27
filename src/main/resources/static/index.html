@@ -132,12 +132,15 @@
         methods: {
             getTree: function () {
                 axios
-                    .get('http://y21bpmh.nat.ipyingshe.com/crawler/getTree', {params: {
-                            date: this.datetime.toLocaleDateString()
-                    }})
+                    .get('http://localhost/crawler/getTree', {
+                        params: {
+                            date: this.dateToString(this.datetime)
+                        }
+                    })
                     .then(res => {
                     this.data = res.data;
-            });
+            })
+                ;
 
 
             }
@@ -152,16 +155,17 @@
             ,
             getPage: function () {
                 axios
-                    .post('http://y21bpmh.nat.ipyingshe.com/crawler/getPage', this.getParam())
+                    .post('http://localhost/crawler/getPage', this.getParam())
                     .then(res => {
                     this.tableData = res.data.list;
-                    this.total = res.data.total;
-                });
+                this.total = res.data.total;
+            })
+                ;
             }
             ,
             getParam: function () {
                 return {
-                    date:this.datetime.toLocaleDateString(),
+                    date: this.dateToString(this.datetime),
                     pageNum: this.page,
                     pageSize: this.rows,
                     mt: this.mt,
@@ -170,6 +174,19 @@
                 }
             }
             ,
+            dateToString: function (date) {
+                var year = date.getFullYear();
+                var month = (date.getMonth() + 1).toString();
+                var day = (date.getDate()).toString();
+                if (month.length == 1) {
+                    month = "0" + month;
+                }
+                if (day.length == 1) {
+                    day = "0" + day;
+                }
+                var dateTime = year + "-" + month + "-" + day;
+                return dateTime;
+            },
             // 获取表格选中值
             handleSelectionChange: function (val) {
                 this.multipleTable = val
@@ -188,9 +205,9 @@
         },
         watch: {
             datetime: function () {
-                this.data=[];
-                this.tableData=[];
-                this.total=0;
+                this.data = [];
+                this.tableData = [];
+                this.total = 0;
                 this.getTree()
 
             }
