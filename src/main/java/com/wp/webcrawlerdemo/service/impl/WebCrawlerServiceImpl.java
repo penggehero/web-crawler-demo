@@ -21,6 +21,7 @@ import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Predicate;
@@ -49,6 +50,7 @@ public class WebCrawlerServiceImpl implements WebCrawlerService {
     public void getInfoFromKeQQ() throws Exception {
         Date now = new Date();
         List<CourseCategory> allLevel = getAllLevel(now);
+        CountDownLatch countDownLatch = new CountDownLatch(allLevel.size());
         if (!CollectionUtils.isEmpty(allLevel)) {
             for (CourseCategory courseCategory : allLevel) {
                 // 三级分类下面的课程信息 使用多线程异步拉取
@@ -57,10 +59,16 @@ public class WebCrawlerServiceImpl implements WebCrawlerService {
                         getCourseInfo(courseCategory, now);
                     } catch (Exception e) {
                         log.error("爬取课程信息出现错误！",e);
+                    }finally {
+                        // 计数
+                        countDownLatch.countDown();
                     }
                 });
             }
         }
+        // 等待所有的课程拉取完再汇总
+        countDownLatch.await();
+        // 汇总结果
         summary(now);
     }
 
