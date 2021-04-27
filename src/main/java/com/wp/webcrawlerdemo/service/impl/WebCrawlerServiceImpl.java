@@ -9,6 +9,7 @@ import com.wp.webcrawlerdemo.domain.vo.CourseVo;
 import com.wp.webcrawlerdemo.mapper.CourseCategoryMapper;
 import com.wp.webcrawlerdemo.mapper.CourseMapper;
 import com.wp.webcrawlerdemo.service.WebCrawlerService;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -20,6 +21,8 @@ import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -28,11 +31,15 @@ import java.util.stream.Collectors;
  * @date 2021/4/25 21:51
  */
 @Service
+@Slf4j
 public class WebCrawlerServiceImpl implements WebCrawlerService {
     @Autowired
     private CourseMapper courseMapper;
     @Autowired
     private CourseCategoryMapper courseCategoryMapper;
+
+    // 线程池提供异步操作
+    private static ExecutorService executor = Executors.newFixedThreadPool(10);
 
 
     private static final String INDEX_URL = "https://ke.qq.com/";
@@ -44,7 +51,14 @@ public class WebCrawlerServiceImpl implements WebCrawlerService {
         List<CourseCategory> allLevel = getAllLevel(now);
         if (!CollectionUtils.isEmpty(allLevel)) {
             for (CourseCategory courseCategory : allLevel) {
-                getCourseInfo(courseCategory, now);
+                // 三级分类下面的课程信息 使用多线程异步拉取
+                executor.submit(() -> {
+                    try {
+                        getCourseInfo(courseCategory, now);
+                    } catch (Exception e) {
+                        log.error("爬取课程信息出现错误！",e);
+                    }
+                });
             }
         }
         summary(now);
