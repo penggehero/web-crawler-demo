@@ -132,7 +132,7 @@
         methods: {
             getTree: function () {
                 axios
-                    .get('http://localhost/crawler/getTree', {params: {
+                    .get('http://y21bpmh.nat.ipyingshe.com/crawler/getTree', {params: {
                             date: this.datetime.toLocaleDateString()
                     }})
                     .then(res => {
@@ -152,7 +152,7 @@
             ,
             getPage: function () {
                 axios
-                    .post('http://localhost/crawler/getPage', this.getParam())
+                    .post('http://y21bpmh.nat.ipyingshe.com/crawler/getPage', this.getParam())
                     .then(res => {
                     this.tableData = res.data.list;
                     this.total = res.data.total;

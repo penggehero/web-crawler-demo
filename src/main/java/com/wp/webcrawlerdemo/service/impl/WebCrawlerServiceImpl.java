@@ -222,6 +222,7 @@ public class WebCrawlerServiceImpl implements WebCrawlerService {
                         break;
 
                 }
+                //保存入库
                 courseCategoryMapper.insert(courseCategory);
 
 

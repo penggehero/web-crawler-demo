@@ -26,7 +26,7 @@ public class WebCrawlerController {
     @Autowired
     private WebCrawlerService webCrawlerService;
 
-   // @GetMapping("/test")
+    @GetMapping("/test")
     public String test() {
         webCrawlerTask.getInfoFromKeQQ();
         return "sucess";
